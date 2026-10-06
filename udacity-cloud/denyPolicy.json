@@ -1,0 +1,13 @@
+{
+  "if": {
+    "allOf": [
+      {
+        "field": "Microsoft.Resources/tags",
+        "equals": "false"
+      }
+    ]
+  },
+  "then": {
+    "effect": "deny"
+  }
+}

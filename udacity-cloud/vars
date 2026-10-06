@@ -1,0 +1,3 @@
+export ARM_CLIENT_ID=<application-id>
+export ARM_CLIENT_SECRET=<secret-key>
+export SUBSCRIPTION_ID=

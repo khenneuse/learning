@@ -1,0 +1,30 @@
+* Install tools
+**
+* Deploy a Policy
+** Write a policy definition to deny the creation of resources that do not have tags
+
+** Apply the 'tagging-policy' definition to the Azure subscription
+** Use `az policy assignment list` and take a screen shot
+* Packer Template
+In order to support application deployment, we'll need to create an
+image that different organizations can take advantage of to deploy
+their own apps!  To do this, we'll create a packer image that anyone
+can use, and we'll leverage in our own Terraform template.
+- Use an Ubuntu 18.04-LTS SKU as your base image
+-
+* Terraform Template
+- Use existing resource group
+- Create a virtual network and a subnetwork
+- Create a Network Security Group. Ensure that you explicitly allow
+  access to other VMs on the subnet and deny direct access from the
+  internet.
+- Create a network interface
+- Create a public IP
+- Create a Load Balancer. Your load balancer will need a backend
+  address pool and address pool association for the network interface
+  and the load balancer.
+- Create a virtual machine availability set
+- Create virtual machines from the Packer image
+- Create managed disks for the virtual machines
+- Ensure a variables file file allows for customers to configure the
+  number of virtual machines and the deployment at a minimum.
