@@ -6,12 +6,18 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_image" "packer_image" {
+  name                = "myPackerImage"
+  resource_group_name = "AZUREDEVOPS"
+}
+
 resource "azurerm_virtual_network" "udacity-final" {
   name                = "${var.prefix}-network"
   address_space       = ["10.0.0.0/22"]
   location            = var.location
   resource_group_name = var.resource_group_name
 
+  # MUST use the exact policy tag name discovered in your JSON definition
   tags = {
     environment = "Udacity_Final"
   }
@@ -29,8 +35,6 @@ resource "azurerm_network_security_group" "udacity-final" {
   resource_group_name = var.resource_group_name
   location            = var.location
 
-
-  # Rule 1: Allow internal subnet-to-subnet traffic
   security_rule {
     name                       = "Allow-Subnet-Inbound"
     priority                   = 100
@@ -43,7 +47,6 @@ resource "azurerm_network_security_group" "udacity-final" {
     destination_address_prefix = azurerm_subnet.internal.address_prefixes[0]
   }
 
-  # Rule 2: Allow Load Balancer traffic
   security_rule {
     name                       = "Allow-LB-Inbound"
     priority                   = 200
@@ -52,11 +55,10 @@ resource "azurerm_network_security_group" "udacity-final" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "80"
-    source_address_prefix      = "AzureLoadBalancer" # Built-in Azure tag for LB traffic
+    source_address_prefix      = "AzureLoadBalancer"
     destination_address_prefix = azurerm_subnet.internal.address_prefixes[0]
  }
 
-  # Rule 3: Block all traffic coming from the outside world
   security_rule {
     name                       = "Deny-Internet-Inbound"
     priority                   = 300
@@ -78,6 +80,7 @@ resource "azurerm_subnet_network_security_group_association" "udacity-final" {
   subnet_id                 = azurerm_subnet.internal.id
   network_security_group_id = azurerm_network_security_group.udacity-final.id
 }
+
 resource "azurerm_network_interface" "udacity-final" {
   count               = var.vm_count
   name                = "${var.prefix}-nic-${count.index}"
@@ -165,17 +168,16 @@ resource "azurerm_linux_virtual_machine" "udacity-final" {
 
   admin_username                  = "udacityadmin"
   disable_password_authentication = true
+  admin_ssh_key {
+    username   = "udacityadmin"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
 
   network_interface_ids = [
     azurerm_network_interface.udacity-final[count.index].id,
   ]
 
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
-  }
+  source_image_id = data.azurerm_image.packer_image.id
 
   os_disk {
     storage_account_type = "Standard_LRS"
