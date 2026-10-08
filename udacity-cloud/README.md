@@ -16,6 +16,9 @@ For this project, you will write a Packer template and a Terraform template to d
 3. Install [Packer](https://www.packer.io/downloads)
 4. Install [Terraform](https://www.terraform.io/downloads.html)
 
+### Customizations
+If you are not familiar with terraform, you can modify the values in the [vars.tf](./tf/vars.tf). You will notice that all of them have been defaulted for my own ease of use. You can modify the values in the vars.tf or you can use the other ways described in the [documentation](https://developer.hashicorp.com/terraform/tutorials/cli/variables)
+
 ### Instructions
 After you have either cloned this repo or copied over the files listed below you can run the following commands to build the infrastructure.
 All commands below assume you are using the Bash shell in Azure.
